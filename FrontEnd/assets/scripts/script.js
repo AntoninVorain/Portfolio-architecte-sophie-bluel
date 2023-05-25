@@ -5,7 +5,7 @@ async function getProjects() {
   await fetch("http://localhost:5678/api/works")
     .then((response) => response.json())
     .then((projectsResponse) => {
-      console.log(projectsResponse);
+      //console.log(projectsResponse);
       projects=projectsResponse
     })
     .catch((error) => console.log(error))
@@ -15,7 +15,7 @@ async function getCategories() {
   await fetch("http://localhost:5678/api/categories")
   .then((response) => response.json())
     .then((categoriesResponse) => {
-      console.log(categoriesResponse);
+      //console.log(categoriesResponse);
       categories = categoriesResponse;
     })
     .catch((error) => console.log(error))
@@ -38,6 +38,13 @@ async function displayProjects() {
 }
 displayProjects()
 
+const tous = document.getElementById("tous")
+tous.addEventListener("click", (e) => {
+  let figures = document.querySelectorAll(".gallery figure")
+  for (const figure of figures) {
+    figure.classList.replace("hidden", "display")        
+  }
+})
 
 async function displayCategories() {
   await getProjects()
@@ -46,6 +53,7 @@ async function displayCategories() {
     let button = document.createElement("button")
     button.innerText = category.name
     filters.appendChild(button)
+    // tous.appendChild(button)
     button.addEventListener("click", (e) => {
       let figures = document.querySelectorAll(".gallery figure")
       for (const figure of figures) {
