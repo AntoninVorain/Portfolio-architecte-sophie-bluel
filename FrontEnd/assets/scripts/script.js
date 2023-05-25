@@ -1,4 +1,6 @@
+const filters = document.querySelector(".filters")
 let projects = [];
+let categories = [];
 async function getProjects() {
   await fetch("http://localhost:5678/api/works")
     .then((response) => response.json())
@@ -8,6 +10,17 @@ async function getProjects() {
     })
     .catch((error) => console.log(error))
 }
+
+async function getCategories() {
+  await fetch("http://localhost:5678/api/categories")
+  .then((response) => response.json())
+    .then((categoriesResponse) => {
+      console.log(categoriesResponse);
+      categories = categoriesResponse;
+    })
+    .catch((error) => console.log(error))
+}
+
 // getProjects();
 async function displayProjects() {
   await getProjects();
@@ -15,6 +28,8 @@ async function displayProjects() {
   gallery.innerHTML = ``;
   for (const project of projects) {
     let figureElement = document.createElement('figure');
+    figureElement.setAttribute("data-categoryId", project.categoryId)
+    figureElement.setAttribute("class", "display")
     figureElement.innerHTML = `
             <img crossorigin="anonymous" src="${project.imageUrl}" alt="${project.title}">
             <figcaption>${project.title}</figcaption>`;
@@ -22,3 +37,27 @@ async function displayProjects() {
   }
 }
 displayProjects()
+
+
+async function displayCategories() {
+  await getProjects()
+  await getCategories()
+  for (const category of categories) {
+    let button = document.createElement("button")
+    button.innerText = category.name
+    filters.appendChild(button)
+    button.addEventListener("click", (e) => {
+      let figures = document.querySelectorAll(".gallery figure")
+      for (const figure of figures) {
+        if (parseInt(figure.getAttribute("data-categoryId")) === category.id)
+        {
+          figure.classList.replace("hidden", "display")
+        } else {
+          figure.classList.replace("display", "hidden")
+        }        
+      }
+    })
+  }
+}
+
+displayCategories();
