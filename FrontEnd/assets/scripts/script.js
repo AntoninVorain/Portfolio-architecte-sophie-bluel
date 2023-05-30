@@ -1,8 +1,54 @@
+import { API_URL, AUTHORIZED_TYPE } from "./Constantes.js";
+import { SessionManager } from "./SessionManager.js";
+
 const filters = document.querySelector(".filters")
 let projects = [];
 let categories = [];
+
+(async () => {
+  let works = new Set(await fetch(`${API_URL}/works`).then(response => response.json()))
+  SessionManager().refreshHUD(works);
+//   updateCategories(works)
+//   changeArrayForFilter(works, {id: 0})
+
+  if (SessionManager().isAuthenticated()) {
+      
+      
+      const addWork = async (e) => {
+          clearFormErrors()
+          e.preventDefault()
+    
+          const image = e.target.image.files[0]
+          const title = e.target.title.value
+          const category = parseInt(e.target.category.value)
+
+          const data = {
+              image: image,
+              title: title,
+              category: category
+          }
+
+          const formData = new FormData()
+          formData.append('image', data.image)
+          formData.append('title', data.title)
+          formData.append('category', data.category)
+          formData.forEach((e) => e === undefined ? appendsFormError(`${e} est requis<br>`) : '')
+      
+          await fetch(`${API_URL}/works`, {
+              method: 'POST',
+              headers: {
+                  "accept": "*/*",
+                  "Authorization": `Bearer ${SessionManager().getToken()}`
+              },
+              body: formData
+          })
+          
+      }
+}
+})();
+
 async function getProjects() {
-  await fetch("http://localhost:5678/api/works")
+  await fetch(`${API_URL}/works`)
     .then((response) => response.json())
     .then((projectsResponse) => {
       //console.log(projectsResponse);
@@ -12,7 +58,7 @@ async function getProjects() {
 }
 
 async function getCategories() {
-  await fetch("http://localhost:5678/api/categories")
+  await fetch(`${API_URL}/categories`)
   .then((response) => response.json())
     .then((categoriesResponse) => {
       //console.log(categoriesResponse);
@@ -39,6 +85,7 @@ async function displayProjects() {
 displayProjects()
 
 const tous = document.getElementById("tous")
+tous.classList.add("button.active")  
 tous.addEventListener("click", (e) => {
   let figures = document.querySelectorAll(".gallery figure")
   for (const figure of figures) {
@@ -53,8 +100,8 @@ async function displayCategories() {
     let button = document.createElement("button")
     button.innerText = category.name
     filters.appendChild(button)
-    // tous.appendChild(button)
     button.addEventListener("click", (e) => {
+      button.classList.add("button.active")
       let figures = document.querySelectorAll(".gallery figure")
       for (const figure of figures) {
         if (parseInt(figure.getAttribute("data-categoryId")) === category.id)
