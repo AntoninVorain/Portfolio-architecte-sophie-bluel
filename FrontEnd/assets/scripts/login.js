@@ -46,3 +46,23 @@ loginForm.addEventListener('submit', async (e) => {
             errorsMessage.innerText = `${request.status} ${request.statusText}`
     }
 })
+    
+const input = document.getElementById("email")
+const patterns = {
+    email: /^([a-z\d\.-]+)@([a-z\d-]+)\.([a-z]{2,8})(\.[a-z]{2,8})?$/
+}
+// var regex = /^([a-zA-Z0-9\._]+)@([a-zA-Z0-9])+.([a-z]+)(.[a-z]+)?$/
+
+
+function validate(field, regex) {
+    if (regex.test(field.value)) {
+        field.className='valid'
+    }
+    else {
+        field.className='invalid'
+    }
+}
+
+input.addEventListener('keyup', (e) => {
+    validate(e.target, patterns[e.target.attributes.name.value])
+})
