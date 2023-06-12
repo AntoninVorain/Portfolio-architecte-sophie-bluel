@@ -48,8 +48,12 @@ loginForm.addEventListener('submit', async (e) => {
 })
     
 const input = document.getElementById("email")
+const password = document.getElementById("password")
 const patterns = {
     email: /^([a-z\d\.-]+)@([a-z\d-]+)\.([a-z]{2,8})(\.[a-z]{2,8})?$/
+}
+const pattern2 = {
+    password: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/
 }
 // var regex = /^([a-zA-Z0-9\._]+)@([a-zA-Z0-9])+.([a-z]+)(.[a-z]+)?$/
 
@@ -65,4 +69,8 @@ function validate(field, regex) {
 
 input.addEventListener('keyup', (e) => {
     validate(e.target, patterns[e.target.attributes.name.value])
+})
+
+password.addEventListener('keyup', (e) => {
+    validate(e.target, pattern2[e.target.attributes.name.value])
 })

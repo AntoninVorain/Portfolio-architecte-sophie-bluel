@@ -1,54 +1,10 @@
 import { API_URL, AUTHORIZED_TYPE } from "./Constantes.js";
 import { SessionManager } from "./SessionManager.js";
+import { openModal, closeModal, resetAddworkForm } from "./modale.js";
 
-let modal = null;
-const focusableSelector = "button, a, input, textarea";
-let focusables = [];
-let previouslyFocusedElement = null;
 
-const openModal = async (e) => {
-  e.preventDefault();
-  const target = e.target.getAttribute("href");
-  modal = document.querySelector(target);
-  focusables = Array.from(modal.querySelectorAll(focusableSelector));
-  previouslyFocusedElement = document.querySelector(":focus");
-  modal.style.display = null;
-  focusables[0]?.focus();
-  modal.removeAttribute("aria-hidden");
-  modal.setAttribute("aria-modal", "true");
-  modal.addEventListener("click", closeModal);
-  modal.querySelectorAll(".js-modal-close")?.forEach((element) => {
-    element?.addEventListener("click", closeModal);
-  });
-  modal
-    .querySelector(".js-modal-stop")
-    ?.addEventListener("click", stopPropagation);
-};
-const closeModal = (e) => {
-  if (modal === null) return;
-  if (previouslyFocusedElement !== null) previouslyFocusedElement.focus();
-  e.preventDefault();
-  resetAddworkForm();
-  document
-    .querySelector("button.add-picture-modal-link")
-    .classList.add("disabled");
-  modal.setAttribute("aria-hidden", "true");
-  modal.removeAttribute("aria-modal");
-  modal.removeEventListener("click", closeModal);
-  modal.querySelectorAll(".js-modal-close")?.forEach((element) => {
-    element?.removeEventListener("click", closeModal);
-  });
-  modal
-    .querySelector(".js-modal-stop")
-    ?.removeEventListener("click", stopPropagation);
-  const hideModal = () => {
-    modal.style.display = "none";
-    modal.removeEventListener("animationend", hideModal);
-    modal = null;
-    document.querySelector(".modal-wrapper").classList.remove("slided");
-  };
-  modal.addEventListener("animationend", hideModal);
-};
+
+
 window.addEventListener("keydown", (e) => {
   if (e.key === "Escape" || e.key === "Esc") closeModal(e);
   if (e.key === "Tab" && modal !== null) focusInModal(e);
@@ -69,9 +25,7 @@ const focusInModal = (e) => {
   }
   focusables[index].focus();
 };
-const stopPropagation = (e) => {
-  e.stopPropagation();
-};
+
 
 /**
  * Section de chargement des travaux
@@ -110,6 +64,8 @@ const applyFilterListener = (works) => {
     });
   });
 };
+
+
 
 /**
  * Fonction principale de gestion des projets
@@ -329,7 +285,7 @@ const applyFilterListener = (works) => {
         if (AUTHORIZED_TYPE.includes(type)) {
           reader.onload = (function () {
             return (e) => {
-              localStorage.setItem("tempWork", e.target.result);
+              // localStorage.setItem("tempWork", e.target.result);
 
               noThumb.style.display = "none";
               loadedImage.style.display = "flex";
@@ -382,13 +338,13 @@ const applyFilterListener = (works) => {
       })
         .then((response) => response.json())
         .then((data) => {
-          let clonedWorks = works;
+          // let clonedWorks = works;
           const currentCategory = categoriesLoop.filter(
             (category) => category.id === parseInt(e.target.category.value)
           );
 
-          clonedWorks = Array.from(
-            clonedWorks.add({
+          works = Array.from(
+            works.add({
               category: currentCategory[0],
               categoryId: parseInt(data.categoryId),
               id: data.id,
@@ -398,7 +354,7 @@ const applyFilterListener = (works) => {
             })
           );
 
-          works = new Set(clonedWorks);
+          works = new Set(works);
           changeArrayForFilter(works, { id: 0 });
           updateCategories(works);
           refreshWorkLoop(works);
@@ -428,9 +384,9 @@ const applyFilterListener = (works) => {
           Authorization: `Bearer ${SessionManager().getToken()}`,
         },
       }).then(() => {
-        let clonedWorks = works;
-        clonedWorks = [...clonedWorks].filter((work) => work.id !== workId);
-        works = new Set(clonedWorks);
+        // let clonedWorks = works;
+        works = [...works].filter((work) => work.id !== workId);
+        works = new Set(works);
         changeArrayForFilter(works, { id: 0 });
         refreshWorkLoop(works);
         updateCategories(works);
@@ -439,7 +395,7 @@ const applyFilterListener = (works) => {
           .forEach((element) => element.addEventListener("click", removeWork));
         // if (works.length === 0) closeModal(e)
       });
-    };
+};
 
     document
       .querySelectorAll(".js-work-delete")
@@ -456,30 +412,8 @@ const appendsFormError = (message) => {
   formErrors.innerHTML += `${message}<br>`;
 };
 
-/**
- * Nettoyage de la thumbnail du formulaire d'ajout
- */
-const cleanThumb = () => {
-  localStorage.removeItem("tempWork");
 
-  let noThumb = document.querySelector(".js-no-thumb");
-  noThumb.style.display = "flex";
 
-  let loadedImage = document.querySelector(".loaded-img");
-  let imgThumb = document.querySelector(".js-thumb");
-  loadedImage.style.display = "none";
-  imgThumb.removeAttribute("src");
-};
-
-/**
- * Remise a zéro du formulaire d'ajout
- */
-const resetAddworkForm = () => {
-  cleanThumb();
-  document.querySelector("#title").value = ``;
-  document.querySelector("#category").value = ``;
-  document.querySelector("#image").value = ``;
-};
 
 /**
  * Fonction de mise a jour du tableau de travaux
@@ -501,3 +435,4 @@ const changeArrayForFilter = (works, filter) => {
     gallery.appendChild(figureElement);
   });
 };
+
