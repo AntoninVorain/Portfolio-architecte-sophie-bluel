@@ -49,6 +49,7 @@ loginForm.addEventListener('submit', async (e) => {
     
 const input = document.getElementById("email")
 const password = document.getElementById("password")
+
 const patterns = {
     email: /^([a-z\d\.-]+)@([a-z\d-]+)\.([a-z]{2,8})(\.[a-z]{2,8})?$/
 }

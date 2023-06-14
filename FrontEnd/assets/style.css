@@ -732,7 +732,7 @@ p.form-errors {
 }
 
 input.valid{
-	border: 0.2rem solid #36cc36;
+	border: 0.2rem solid #36cc36 !important;
 }
 
 input.invalid{

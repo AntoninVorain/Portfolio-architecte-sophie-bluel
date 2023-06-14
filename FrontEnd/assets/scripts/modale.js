@@ -77,4 +77,21 @@ const closeModal = (e) => {
   modal.addEventListener("animationend", hideModal);
 };
 
-export { openModal, closeModal };
+const focusInModal = (e) => {
+  e.preventDefault();
+  let index = focusables.findIndex((f) => f === modal.querySelector(":focus"));
+  if (e.shiftKey === true) {
+    index--;
+  } else {
+    index++;
+  }
+  if (index >= focusables.length) {
+    index = 0;
+  }
+  if (index < 0) {
+    index = focusables.length - 1;
+  }
+  focusables[index].focus();
+};
+
+export { openModal, closeModal, focusInModal };

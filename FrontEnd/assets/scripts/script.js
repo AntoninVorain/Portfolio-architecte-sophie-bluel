@@ -2,30 +2,12 @@ import { API_URL, AUTHORIZED_TYPE } from "./Constantes.js";
 import { SessionManager } from "./SessionManager.js";
 import { openModal, closeModal, resetAddworkForm } from "./modale.js";
 
-
-
+let modal = null;
 
 window.addEventListener("keydown", (e) => {
   if (e.key === "Escape" || e.key === "Esc") closeModal(e);
   if (e.key === "Tab" && modal !== null) focusInModal(e);
 });
-const focusInModal = (e) => {
-  e.preventDefault();
-  let index = focusables.findIndex((f) => f === modal.querySelector(":focus"));
-  if (e.shiftKey === true) {
-    index--;
-  } else {
-    index++;
-  }
-  if (index >= focusables.length) {
-    index = 0;
-  }
-  if (index < 0) {
-    index = focusables.length - 1;
-  }
-  focusables[index].focus();
-};
-
 
 /**
  * Section de chargement des travaux
@@ -64,8 +46,6 @@ const applyFilterListener = (works) => {
     });
   });
 };
-
-
 
 /**
  * Fonction principale de gestion des projets
@@ -304,6 +284,27 @@ const applyFilterListener = (works) => {
         }
       });
 
+      const titleInput = document.querySelector("#title");
+      console.log(titleInput)
+
+      function validate(field, regex) {
+        console.log(regex.test(field.value))
+        if (regex.test(field.value) === true) {
+            field.className='valid'
+        }
+        else {
+            field.className='invalid'
+        }
+      }
+      
+      const pattern = {
+        password: /^[a-zA-Z]+$/
+      }
+
+      titleInput.addEventListener('keyup', (e) => {
+        validate(e.target, pattern.password)
+      })
+
     /**
      * Fonction d'ajout de travaux (works)
      */
@@ -314,61 +315,66 @@ const applyFilterListener = (works) => {
       const title = e.target.title.value;
       const category = parseInt(e.target.category.value);
 
-      const data = {
-        image: image,
-        title: title,
-        category: category,
-      };
-
-      const formData = new FormData();
-      formData.append("image", data.image);
-      formData.append("title", data.title);
-      formData.append("category", data.category);
-      formData.forEach((e) =>
-        e === undefined ? appendsFormError(`${e} est requis<br>`) : ""
-      );
-
-      await fetch(`${API_URL}/works`, {
-        method: "POST",
-        headers: {
-          accept: "*/*",
-          Authorization: `Bearer ${SessionManager().getToken()}`,
-        },
-        body: formData,
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          // let clonedWorks = works;
-          const currentCategory = categoriesLoop.filter(
-            (category) => category.id === parseInt(e.target.category.value)
-          );
-
-          works = Array.from(
-            works.add({
-              category: currentCategory[0],
-              categoryId: parseInt(data.categoryId),
-              id: data.id,
-              imageUrl: data.imageUrl,
-              title: data.title,
-              userId: data.userId,
-            })
-          );
-
-          works = new Set(works);
-          changeArrayForFilter(works, { id: 0 });
-          updateCategories(works);
-          refreshWorkLoop(works);
-          document.querySelector(".modal-wrapper").classList.remove("slided");
-          document
-            .querySelectorAll(".js-work-delete")
-            .forEach((element) =>
-              element.addEventListener("click", removeWork)
+      if (image != null && title != null && category != null) {
+        const data = {
+          image: image,
+          title: title,
+          category: category,
+        };
+  
+        const formData = new FormData();
+        formData.append("image", data.image);
+        formData.append("title", data.title);
+        formData.append("category", data.category);
+        formData.forEach((e) =>
+          e === undefined ? appendsFormError(`${e} est requis<br>`) : ""
+        );
+        
+        await fetch(`${API_URL}/works`, {
+          method: "POST",
+          headers: {
+            accept: "*/*",
+            Authorization: `Bearer ${SessionManager().getToken()}`,
+          },
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // let clonedWorks = works;
+            const currentCategory = categoriesLoop.filter(
+              (category) => category.id === parseInt(e.target.category.value)
             );
-          document
-            .querySelector("button.add-picture-modal-link")
-            .classList.add("disabled");
-          resetAddworkForm();
-        });
+  
+            works = Array.from(
+              works.add({
+                category: currentCategory[0],
+                categoryId: parseInt(data.categoryId),
+                id: data.id,
+                imageUrl: data.imageUrl,
+                title: data.title,
+                userId: data.userId,
+              })
+            );
+  
+            works = new Set(works);
+            changeArrayForFilter(works, { id: 0 });
+            updateCategories(works);
+            refreshWorkLoop(works);
+            document.querySelector(".modal-wrapper").classList.remove("slided");
+            document
+              .querySelectorAll(".js-work-delete")
+              .forEach((element) =>
+                element.addEventListener("click", removeWork)
+              );
+            document
+              .querySelector("button.add-picture-modal-link")
+              .classList.add("disabled");
+            resetAddworkForm();
+          });
+      }
+
+
+      
     };
 
     /**
@@ -390,9 +396,9 @@ const applyFilterListener = (works) => {
         changeArrayForFilter(works, { id: 0 });
         refreshWorkLoop(works);
         updateCategories(works);
-        document
-          .querySelectorAll(".js-work-delete")
-          .forEach((element) => element.addEventListener("click", removeWork));
+        // document
+        //   .querySelectorAll(".js-work-delete")
+        //   .forEach((element) => element.addEventListener("click", removeWork));
         // if (works.length === 0) closeModal(e)
       });
 };
