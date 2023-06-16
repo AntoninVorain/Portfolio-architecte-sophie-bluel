@@ -17,7 +17,7 @@ export const resetAddworkForm = () => {
  * Nettoyage de la thumbnail du formulaire d'ajout
  */
 const cleanThumb = () => {
-  localStorage.removeItem("tempWork");
+  // localStorage.removeItem("tempWork");
 
   let noThumb = document.querySelector(".js-no-thumb");
   noThumb.style.display = "flex";

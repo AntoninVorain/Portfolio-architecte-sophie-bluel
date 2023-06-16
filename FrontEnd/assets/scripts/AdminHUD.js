@@ -12,9 +12,11 @@ export const createAdminHUD = (data = null) => {
     const bioTextBtn = document.createElement('button')
     const bioImageBtn = document.createElement('button')
     const worksBtn = document.createElement('a')
+    const filters = document.querySelector('.filters-container')
     bioTextBtn.classList.add('btn-editor', 'auth-component')
     bioImageBtn.classList.add('btn-editor', 'auth-component')
     worksBtn.classList.add('modal-link', 'auth-component', 'js-works-edition', 'js-modal')
+    filters.setAttribute("style", "display: none;");
     worksBtn.setAttribute('href', '#modal1')
 
     const btnPattern = `
@@ -67,4 +69,5 @@ export const createAdminHUD = (data = null) => {
  */
 export const deleteAdminHUD = () => {
     document.querySelectorAll('.auth-component').forEach((component) => component.remove());
+    document.querySelector('.filters-container').setAttribute("style", "display: flex;");
 }
